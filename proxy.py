@@ -3,12 +3,33 @@
 '''
 AJAX proxy
 
-Allow an AJAX script to access a 3rd party site.
+Serve HTTP pages.  Allow an AJAX script to access a 3rd party site.
 
-Example: Use "http://localhost:8080/redirect?dest=http://api.search.yahoo.com"
-in AJAX script in order to access "http://api.search.yahoo.com" from the
-script.  That's assuming that the original AJAX page was served from this
-same proxy.
+
+Example using the GWT JSON sample application.
+
+1) Modify JSON source code.
+	$ cd gwt-linux-1.4.62/samples/JSON/src/com/google/gwt/sample/json/client
+	Edit JSON.java
+
+	Change this line:
+	    private static final String DEFAULT_SEARCH_URL = "search-results.js";
+	to this:
+		private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/redirect?dest=http://api.search.yahoo.com/ImageSearchService/V1/imageSearch?appid=YahooDemo&query=potato&results=2&output=json";
+
+2) Compile the JSON code as usual.
+	$ cd gwt-linux-1.4.62/samples/JSON
+	$ JSON-compile
+
+3) Start this server.
+	$ cd gwt-linux-1.4.62/samples/JSON/www/com.google.gwt.sample.json.JSON
+	$ proxy.py .  # Serve files from current directory.
+
+3) Access the app in your browser using this URL.
+	http://localhost:8080/JSON.html
+
+4) Presss the Search button to access JSON data from yahoo site.
+
 
 Based on code from http://effbot.org/librarybook/simplehttpserver.htm
 
