@@ -46,7 +46,7 @@ class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Is this a special request to redirect?
 		prefix = '/redirect?dest='
 		if self.path.startswith(prefix):
-			# Strip off the pefix.
+			# Strip off the prefix.
 			newPath = self.path.lstrip(prefix)
 		else:
 			# Concatenate the curr dir with the relative path.
