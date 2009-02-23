@@ -15,7 +15,7 @@ Example using the GWT JSON sample application.
 	Change this line:
 	    private static final String DEFAULT_SEARCH_URL = "search-results.js";
 	to this:
-		private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/redirect?dest=http://api.search.yahoo.com/ImageSearchService/V1/imageSearch?appid=YahooDemo&query=potato&results=2&output=json";
+		private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/__ajaxproxy/http://api.search.yahoo.com/ImageSearchService/V1/imageSearch?appid=YahooDemo&query=potato&results=2&output=json";
 
 2) Compile the JSON code as usual.
 	$ cd gwt-linux-1.4.62/samples/JSON
@@ -43,8 +43,8 @@ PORT = 8080
 
 class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	def do_GET(self):
-		# Is this a special request to redirect?
-		prefix = '/redirect?dest='
+		# Is this a special request to /__ajaxproxy/
+		prefix = '/__ajaxproxy/'
 		if self.path.startswith(prefix):
 			# Strip off the prefix.
 			newPath = self.path.lstrip(prefix)
