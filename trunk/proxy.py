@@ -51,6 +51,7 @@ class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		else:
 			# Concatenate the curr dir with the relative path.
 			newPath = self.translate_path(self.path)
+			newPath = "file:"+newPath
 
 		self.copyfile(urllib.urlopen(newPath), self.wfile)
 
