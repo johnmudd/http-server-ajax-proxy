@@ -48,13 +48,15 @@ class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		if self.path.startswith(prefix):
 			# Strip off the prefix.
 			newPath = self.path.lstrip(prefix)
+			print "@remote: "+newPath
 		else:
 			# Concatenate the curr dir with the relative path.
 			newPath = self.translate_path(self.path)
+			print "@local:  "+newPath
 			newPath = "file:"+newPath
-
+			
 		self.copyfile(urllib.urlopen(newPath), self.wfile)
-
+		
 SocketServer.ThreadingTCPServer.allow_reuse_address = True
 httpd = SocketServer.ThreadingTCPServer(('', PORT), Proxy)
 print "serving at port", PORT
