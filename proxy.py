@@ -48,17 +48,13 @@ class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		if self.path.startswith(prefix):
 			# Strip off the prefix.
 			newPath = self.path.lstrip(prefix)
-			print "@remote: ", newPath
+			print "GET remote: ", newPath
+			try:
+				self.copyfile(urllib.urlopen(newPath), self.wfile)
+			except IOError, e:
+				print "ERROR:   ", e
 		else:
-			# Concatenate the curr dir with the relative path.
-			newPath = self.translate_path(self.path)
-			print "@local:  ", newPath
-			newPath = "file:"+newPath
-			
-		try:
-			self.copyfile(urllib.urlopen(newPath), self.wfile)
-		except IOError, e:
-			print "ERROR:   ", e
+			SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 		
 SocketServer.ThreadingTCPServer.allow_reuse_address = True
 httpd = SocketServer.ThreadingTCPServer(('', PORT), Proxy)
