@@ -38,8 +38,19 @@ Based on code from http://effbot.org/librarybook/simplehttpserver.htm
 import SocketServer
 import SimpleHTTPServer
 import urllib
+import socket
 
 PORT = 8080
+
+def get_next_free_port(port):
+	s = socket.socket()
+	try:
+		s.connect(('localhost', port))
+		return get_next_free_port(port + 1)
+	except socket.error, e:
+		return port
+
+
 
 class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	def do_GET(self):
@@ -57,6 +68,7 @@ class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 		
 SocketServer.ThreadingTCPServer.allow_reuse_address = True
-httpd = SocketServer.ThreadingTCPServer(('', PORT), Proxy)
-print "serving at port", PORT
+next_free_port = get_next_free_port(PORT)
+httpd = SocketServer.ThreadingTCPServer(('', next_free_port), Proxy)
+print "serving at port", next_free_port
 httpd.serve_forever()
