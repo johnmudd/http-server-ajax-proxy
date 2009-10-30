@@ -35,10 +35,10 @@ Based on code from http://effbot.org/librarybook/simplehttpserver.htm
 
 '''
 
-import SocketServer
-import SimpleHTTPServer
-import urllib
+import urllib.request
 import socket
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from socketserver import ThreadingMixIn
 
 PORT = 8080
 
@@ -47,28 +47,36 @@ def get_next_free_port(port):
 	try:
 		s.connect(('localhost', port))
 		return get_next_free_port(port + 1)
-	except socket.error, e:
+	except socket.error:
 		return port
 
-
-
-class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class myHTTPServer(SimpleHTTPRequestHandler):
 	def do_GET(self):
 		# Is this a special request to /__ajaxproxy/
 		prefix = '/__ajaxproxy/'
 		if self.path.startswith(prefix):
 			# Strip off the prefix.
 			newPath = self.path.lstrip(prefix)
-			print "GET remote: ", newPath
+			print ('GET remote: ', newPath)
 			try:
-				self.copyfile(urllib.urlopen(newPath), self.wfile)
-			except IOError, e:
-				print "ERROR:   ", e
+				self.copyfile(urllib.request.urlopen(newPath), self.wfile)
+			except IOError as e:
+				print ("ERROR:   ", e)
 		else:
-			SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
-		
-SocketServer.ThreadingTCPServer.allow_reuse_address = True
-next_free_port = get_next_free_port(PORT)
-httpd = SocketServer.ThreadingTCPServer(('', next_free_port), Proxy)
-print "serving at port", next_free_port
-httpd.serve_forever()
+			SimpleHTTPRequestHandler.do_GET(self)
+		return
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+	pass
+
+def main():
+	try:	
+		next_free_port = get_next_free_port(PORT)
+		server = ThreadedHTTPServer(('',next_free_port),myHTTPServer)
+		print ('server started at port ', next_free_port)
+		server.serve_forever()
+	except KeyboardInterrupt:
+		server.socket.close()
+
+if __name__=='__main__':
+    main()
